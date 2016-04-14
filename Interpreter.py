@@ -1,5 +1,6 @@
 # set up token types
 INTEGER = "INTEGER"
+MINUS = "MINUS"
 PLUS = "PLUS"
 EOF = "EOF"
 
@@ -17,10 +18,12 @@ class Interpreter(object):
         self.text = text
         self.pos = 0
         self.token = None
+        
     def error(self):
         raise Exception("Error while parsing input")
+        
     def tokenize(self):
-        text = self.text
+        text = self.text.replace("(", " ( ").replace(")", " ) ").replace("+", " + ").split()
         if self.pos > len(text) -1 : #if at end of file
             return Token("EOF", None)
         char = text[self.pos] #get character at current position
@@ -30,12 +33,17 @@ class Interpreter(object):
         if char == "+":
             self.pos += 1
             return Token(PLUS, char)
+        if char == "-":
+            self.pos += 1 
+            return Token(MINUS, char)
         self.error()
+        
     def eat(self, token_type):
         if self.token.type == token_type:
             self.token = self.tokenize()
         else:
             self.error()
+            
     def evaluate(self): #cant call it eval because it's a reserved word
         self.token = self.tokenize() #get first token
         loperand = self.token
